@@ -34,8 +34,8 @@ The entire full-stack application boots with a single command:
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/24cs73-prince/24CS073_AWDF_P11.git
-cd 24CS073_AWDF_P11
+git clone https://github.com/kashyapnasit109/24CS109_AWF_PRACT11.git
+cd 24CS109_AWF_PRACT11
 
 # 2. Start all services (frontend, backend, mongodb)
 docker compose up --build
