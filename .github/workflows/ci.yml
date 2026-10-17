@@ -40,6 +40,8 @@ jobs:
           test -f middleware/validate.js && echo "✅ middleware/validate.js"
           test -f routes/auth.js && echo "✅ routes/auth.js"
           test -f routes/tasks.js && echo "✅ routes/tasks.js"
+          test -f events.js && echo "✅ events.js"
+          test -f listeners.js && echo "✅ listeners.js"
           test -f public/index.html && echo "✅ public/index.html"
           echo "All files verified!"
 

@@ -4,6 +4,7 @@ const Task = require('../models/Task');
 const auth = require('../middleware/auth');
 const { validateTask } = require('../middleware/validate');
 const cache = require('../utils/cache');
+const taskEvents = require('../events');
 
 const router = express.Router();
 
@@ -142,7 +143,20 @@ router.post('/', validateTask, async (req, res) => {
     // Invalidate user's all-tasks cache after successful write
     cache.invalidateUserTasks(req.user.id);
 
+    const responseTimestamp = new Date().toISOString();
+    console.log(`[API] Sending 201 response at ${responseTimestamp}`);
+
     res.status(201).json(task);
+
+    // Practical 10: Emit task-created event asynchronously after sending response
+    setImmediate(() => {
+      taskEvents.emit('task-created', {
+        taskId: String(task._id),
+        title: task.title,
+        userId: String(task.user),
+        createdAt: task.createdAt ? task.createdAt.toISOString() : new Date().toISOString(),
+      });
+    });
   } catch (err) {
     console.error('Create task error:', err.message);
     if (err.name === 'ValidationError') {
@@ -211,7 +225,20 @@ router.delete('/:id', async (req, res) => {
     // Invalidate both all-tasks cache and this single task cache after successful deletion
     cache.invalidateUserTasks(req.user.id, req.params.id);
 
+    const responseTimestamp = new Date().toISOString();
+    console.log(`[API] Sending 200 response for delete at ${responseTimestamp}`);
+
     res.json({ message: 'Task deleted successfully' });
+
+    // Practical 10: Emit task-deleted event asynchronously after sending response
+    setImmediate(() => {
+      taskEvents.emit('task-deleted', {
+        taskId: String(task._id),
+        title: task.title,
+        userId: String(task.user),
+        deletedAt: new Date().toISOString(),
+      });
+    });
   } catch (err) {
     console.error('Delete task error:', err.message);
     res.status(500).json({ error: 'Failed to delete task' });

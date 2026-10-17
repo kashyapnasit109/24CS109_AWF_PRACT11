@@ -4,6 +4,9 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
+// Register background event listeners for Practical 10
+require('./listeners');
+
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
 
