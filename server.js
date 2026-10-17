@@ -19,8 +19,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static frontend files
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static frontend files (prefers built React dist directory, falls back to public)
+const fs = require('fs');
+const distPath = path.join(__dirname, 'frontend', 'dist');
+const publicPath = path.join(__dirname, 'public');
+const staticPath = fs.existsSync(distPath) ? distPath : publicPath;
+
+app.use(express.static(staticPath));
 
 // ── Routes ───────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
@@ -28,7 +33,7 @@ app.use('/api/tasks', taskRoutes);
 
 // Catch-all: serve index.html for any non-API route
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(staticPath, 'index.html'));
 });
 
 // ── Global Error Handler (from Practical 4) ─────────────────────

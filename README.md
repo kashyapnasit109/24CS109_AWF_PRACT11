@@ -61,12 +61,23 @@ npm run dev
 ## Architecture
 
 ```
-POST /register  → hash password → save User → 201
-POST /login     → verify password → sign JWT → return token
 
-Protected Route Flow:
-  Client Request (Authorization: Bearer <token>)
-    → [Auth Middleware] verifies token → req.user set
-    → [Validation Middleware] checks input
-    → Controller (task routes)
-```
+## Practical 8 — Performance Optimization & Lazy Loading in React
+
+### Overview
+Practical 8 introduces route-based code splitting and lazy loading to optimize initial application load time and minimize the initial JavaScript payload size delivered to the user.
+
+### Concepts & Concepts Implemented
+- **Lazy Loading**: A performance optimization strategy where resources/components are fetched on-demand when required, rather than downloading the entire application payload upfront.
+- **`React.lazy()`**: React standard utility that dynamically imports a component using ECMAScript dynamic `import()`, enabling automated code-splitting by bundlers like Vite.
+- **`React.Suspense`**: A React component boundary wrapper that displays fallback UI (`<LoadingPage />`) while pending dynamically-imported route chunks are being fetched across the network.
+- **Route-Based Code Splitting**:
+  - `Home` (`/`) route remains a static import loaded during initial render.
+  - `Projects` (`/projects`) route is lazy-loaded into a separate bundle chunk (`Projects-*.js`).
+  - `Contact` (`/contact`) route is lazy-loaded into a separate bundle chunk (`Contact-*.js`).
+
+### Bundle Structure & Loading Mechanics
+Route-specific JavaScript is now decoupled from the main bundle and fetched only when navigating to `/projects` or `/contact`. 
+
+Note: Network performance metrics (initial bundle size, load time, JS requests, chunk transfer sizes) are recorded manually via Chrome DevTools under Slow 3G throttling.
+
