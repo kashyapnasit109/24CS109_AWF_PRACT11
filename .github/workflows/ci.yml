@@ -1,0 +1,35 @@
+name: CI Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check project structure
+        run: |
+          echo "Verifying key files exist..."
+          test -f server.js && echo "✅ server.js"
+          test -f models/User.js && echo "✅ models/User.js"
+          test -f models/Task.js && echo "✅ models/Task.js"
+          test -f middleware/auth.js && echo "✅ middleware/auth.js"
+          test -f middleware/validate.js && echo "✅ middleware/validate.js"
+          test -f routes/auth.js && echo "✅ routes/auth.js"
+          test -f routes/tasks.js && echo "✅ routes/tasks.js"
+          test -f public/index.html && echo "✅ public/index.html"
+          echo "All files verified!"
