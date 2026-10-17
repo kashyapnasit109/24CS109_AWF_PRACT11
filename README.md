@@ -1,17 +1,23 @@
-# Practical 7 — Task Management with JWT Authentication
+# Practical 11 — Containerization with Docker and Docker Compose
 
-A full-stack Task Management application with JWT-based authentication, bcrypt password hashing, and Express middleware pipeline.
+A full-stack Task Management application containerized with Docker and orchestrated using Docker Compose, integrating a React (Vite) frontend, Node.js/Express backend API, and MongoDB database with persistent volumes and health checks (building upon Practicals 1–10).
 
 ## Tech Stack
 
+- **Frontend:** React 18, React Router 6, Vite 5
 - **Backend:** Node.js, Express.js, Mongoose
-- **Database:** MongoDB
-- **Auth:** bcryptjs, jsonwebtoken
+- **Database:** MongoDB (Official Docker image)
+- **Containerization & Orchestration:** Docker, Docker Compose
+- **Auth & Security:** bcryptjs, jsonwebtoken (JWT)
 - **Validation:** express-validator
-- **Frontend:** HTML, CSS, JavaScript
+- **Optimization & Events:** node-cache (P9), EventEmitter async notifications (P10)
 
 ## Features
 
+- Multi-container architecture orchestrated via Docker Compose (`docker compose up --build`)
+- React Vite frontend served via multi-stage Docker build on port `5173`
+- Node.js Express backend API running on port `5000` with `/api/health` monitoring
+- MongoDB service on port `27017` with Docker named volume (`mongodb_data`) data persistence
 - User registration with bcrypt password hashing
 - JWT-based login with 1-hour token expiry
 - Auth middleware protecting all task routes
@@ -19,26 +25,42 @@ A full-stack Task Management application with JWT-based authentication, bcrypt p
 - Full CRUD for tasks (scoped to authenticated user)
 - `/me` endpoint for current user details
 - 401 handling — frontend redirects to login on expired token
-- Logout clears token from client
+- In-memory caching with multi-tenant isolation and write invalidation (Practical 9)
+- Non-blocking asynchronous background notification dispatch via EventEmitter (Practical 10)
 
-## Setup
+## Quick Start (Docker Compose)
+
+The entire full-stack application boots with a single command:
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/24cs73-prince/24CS073_AWDF_P7.git
-cd 24CS073_AWDF_P7
+git clone https://github.com/24cs73-prince/24CS073_AWDF_P11.git
+cd 24CS073_AWDF_P11
 
-# 2. Install dependencies
+# 2. Start all services (frontend, backend, mongodb)
+docker compose up --build
+
+# 3. Access the application:
+# Frontend UI: http://localhost:5173
+# Backend API: http://localhost:5000
+# Health Check: http://localhost:5000/api/health
+```
+
+### Standalone Local Development (Without Docker)
+
+```bash
+# 1. Install dependencies
 npm install
+cd frontend && npm install && cd ..
 
-# 3. Create .env file (copy from .env.example)
+# 2. Configure environment
 cp .env.example .env
-# Edit .env with your MongoDB URI and JWT secret
+# Ensure MongoDB is running locally on port 27017
 
-# 4. Start the server
+# 3. Start backend & frontend
 npm run dev
-
-# 5. Open http://localhost:5000
+# In a second terminal:
+cd frontend && npm run dev
 ```
 
 ## API Endpoints
@@ -60,9 +82,15 @@ npm run dev
 
 ## Architecture
 
+```text
+Browser ──► Frontend (React / Vite, port 5173)
+                 │
+                 ▼ (REST API / JSON)
+            Backend (Node / Express, port 5000)
+                 │
+                 ▼ (Mongoose / TCP)
+            MongoDB (Database, port 27017)
 ```
-
-## Practical 8 — Performance Optimization & Lazy Loading in React
 
 ### Overview
 Practical 8 introduces route-based code splitting and lazy loading to optimize initial application load time and minimize the initial JavaScript payload size delivered to the user.

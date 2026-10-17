@@ -1,7 +1,7 @@
 {
-  "name": "practical-7-task-management",
+  "name": "practical-11-task-management",
   "version": "1.0.0",
-  "description": "Task Management Application with JWT Authentication and Middleware Pipeline",
+  "description": "Containerized Task Management Application with Docker Compose, JWT Auth, Caching, and Event Processing",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
