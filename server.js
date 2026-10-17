@@ -30,6 +30,16 @@ const staticPath = fs.existsSync(distPath) ? distPath : publicPath;
 
 app.use(express.static(staticPath));
 
+// ── Health Check Endpoint ───────────────────────────────────────
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
+
 // ── Routes ───────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
@@ -47,13 +57,14 @@ app.use((err, req, res, next) => {
 
 // ── Database Connection & Server Start ──────────────────────────
 const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://mongodb:27017/taskmanager';
 
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(MONGO_URI)
   .then(() => {
     console.log('MongoDB connected successfully');
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server running on http://0.0.0.0:${PORT} (accessible at http://localhost:${PORT})`);
     });
   })
   .catch((err) => {

@@ -91,4 +91,22 @@ Server running on http://localhost:5000
 ```bash
 npm test
 ```
-All 24 automated unit and integration tests (13 for Practical 9 + 11 for Practical 10) will execute and print green checkmarks.
+All automated unit, integration, and containerization verification tests will execute and print green checkmarks.
+
+---
+
+## Practical 11 — Screenshot & Evidence Capture Guide
+**Topic:** Containerization with Docker and Docker Compose
+
+### Required Lab Evidence Checklist
+
+| Screenshot Filename | Description | How to Capture |
+|---|---|---|
+| `p11_01_docker_compose_up_build.png` | Terminal showing `docker compose up --build` building images and starting services | Run `docker compose up --build` in terminal. Capture the build steps, network creation (`app-network`), and the startup logs of `taskmanager-mongodb`, `taskmanager-backend`, and `taskmanager-frontend`. |
+| `p11_02_docker_ps_running_containers.png` | Terminal showing `docker ps` with all 3 containers active and healthy | In a second terminal, execute `docker ps`. Capture the table showing container IDs, image names, statuses (e.g. `Up ... (healthy)`), and mapped ports (`5173`, `5000`, `27017`). |
+| `p11_03_frontend_browser_localhost_5173.png` | Browser displaying React Task Management frontend at `http://localhost:5173` | Open Chrome/Edge at `http://localhost:5173`. Capture the loaded React single-page application with login/task controls. |
+| `p11_04_backend_health_check_200.png` | Browser or Thunder Client showing `GET http://localhost:5000/api/health` | Send a GET request to `http://localhost:5000/api/health`. Capture HTTP `200 OK` and JSON response `{ "status": "healthy", "database": "connected" }`. |
+| `p11_05_browser_task_crud_in_container.png` | Browser showing task created and loaded from MongoDB container | In `http://localhost:5173`, log in and create a new task. Capture the newly populated task card in the UI. |
+| `p11_06_named_volume_persistence.png` | Terminal demonstrating MongoDB data persistence across container stop & start | Run `docker compose down`, followed by `docker compose up -d`. Refresh `http://localhost:5173` to show that existing tasks remain intact from `mongodb_data`. |
+| `p11_07_automated_verification_tests.png` | Terminal showing passing verification test suite | Run `npm test` or `npm run test:p11`. Capture the 11/11 passing checks. |
+
