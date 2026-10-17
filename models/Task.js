@@ -30,9 +30,13 @@ const taskSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+      index: true,
     },
   },
   { timestamps: true }
 );
+
+// Query optimization: Compound index to accelerate Task.find({ user }).sort({ createdAt: -1 })
+taskSchema.index({ user: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Task', taskSchema);

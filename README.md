@@ -81,3 +81,32 @@ Route-specific JavaScript is now decoupled from the main bundle and fetched only
 
 Note: Network performance metrics (initial bundle size, load time, JS requests, chunk transfer sizes) are recorded manually via Chrome DevTools under Slow 3G throttling.
 
+## Practical 9 — In-Memory Caching and Query Optimization
+
+### Overview
+Practical 9 implements server-side in-memory caching using `node-cache` and database query optimization in MongoDB/Mongoose to reduce response latency and database read load for task retrieval.
+
+### Concepts & Implementation Details
+- **In-Memory Caching (`node-cache`)**:
+  - Implemented shared cache module in `utils/cache.js` with standard TTL of 60 seconds (`stdTTL: 60`).
+  - Read endpoints check memory first before querying MongoDB.
+  - Returns `X-Cache: HIT` or `X-Cache: MISS` response headers.
+- **Cache Keys & Multi-Tenant Data Isolation**:
+  - All tasks list: `tasks:${userId}`
+  - Single task item: `task:${userId}:${taskId}`
+  - Including the authenticated `userId` guarantees complete user data isolation.
+- **Cache Invalidation on Writes**:
+  - `POST /api/tasks`: Invalidates `tasks:${userId}` upon successful creation.
+  - `PUT /api/tasks/:id`: Invalidates both `tasks:${userId}` and `task:${userId}:${taskId}` upon successful update.
+  - `DELETE /api/tasks/:id`: Invalidates both `tasks:${userId}` and `task:${userId}:${taskId}` upon successful deletion.
+  - Invalidation only triggers on successful operations (never on validation failure or 404).
+- **Query Optimizations**:
+  - **Mongoose Compound Index**: `taskSchema.index({ user: 1, createdAt: -1 })` avoids full collection scans (`COLLSCAN`) and memory sort overhead during task list queries.
+  - **Single Field Index**: `user: { index: true }` accelerates single-item lookups.
+  - **`.lean()` Execution**: Bypasses Mongoose document hydration to return plain JavaScript objects, reducing CPU and RAM overhead.
+- **Cache Monitoring & Telemetry**:
+  - Protected endpoint `GET /api/tasks/cache-stats` (alias `GET /api/tasks/cache/debug`) reports hit/miss/invalidation counters without exposing secrets or task data.
+  - Protected endpoint `POST /api/tasks/cache-stats/reset` resets telemetry counters for clean benchmarking.
+- **Cache Bypass for Benchmarking**:
+  - Set `CACHE_ENABLED=false` in `.env`, or send request header `x-skip-cache: true` in Thunder Client.
+
